@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora de Cheque de Pago</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #0e0b1a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      font-family: 'Syne', sans-serif;
+    }
+
+    .wrap { width: 100%; max-width: 460px; }
+
+    .glass-card {
+      background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) inset, 0 1px 0 rgba(255,255,255,0.15) inset;
+    }
+
+    .top-banner {
+      background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 40%, #06b6d4 100%);
+      padding: 32px 32px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .top-banner::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 50%;
+    }
+    .top-banner::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: 20px;
+      width: 160px; height: 160px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+
+    .banner-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .banner-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 38px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+    .banner-title span { color: rgba(255,255,255,0.45); }
+
+    .pill-row { display: flex; gap: 8px; margin-top: 16px; }
+    .pill {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: rgba(255,255,255,0.85);
+      letter-spacing: 1px;
+    }
+
+    .body-pad { padding: 28px 32px 32px; }
+
+    .section-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 14px;
+    }
+    .field { margin-bottom: 14px; }
+    .field-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.5px;
+      margin-bottom: 7px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tag {
+      background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(6,182,212,0.3));
+      border: 1px solid rgba(124,58,237,0.4);
+      border-radius: 6px;
+      padding: 1px 7px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: #a78bfa;
+      letter-spacing: 1px;
+    }
+    .input-shell {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 12px;
+      transition: all 0.2s;
+      height: 48px;
+    }
+    .input-shell:focus-within {
+      border-color: rgba(124,58,237,0.6);
+      background: rgba(124,58,237,0.07);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+    }
+    .pre {
+      padding: 0 14px 0 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      color: #7c3aed;
+      font-weight: 500;
+    }
+    .inp {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      color: #f0f0ff;
+      padding: 0;
+    }
+    .inp::placeholder { color: rgba(255,255,255,0.15); }
+    .inp-padded { padding-left: 16px; }
+    .suf {
+      padding: 0 16px 0 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: rgba(255,255,255,0.2);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .sep {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+      margin: 22px 0;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .slider-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 20px;
+      font-weight: 500;
+      background: linear-gradient(135deg, #a78bfa, #22d3ee);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .slider-track {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 5px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      outline: none;
+      cursor: pointer;
+    }
+    .slider-track::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(124,58,237,0.6);
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    .slider-track::-moz-range-thumb {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(124,58,237,0.6);
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    .slider-limits {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 5px;
+    }
+    .slider-limits span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: rgba(255,255,255,0.2);
+    }
+
+    .calc-btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 50%, #06b6d4 100%);
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 8px 24px rgba(124,58,237,0.35);
+      margin-top: 22px;
+    }
+    .calc-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(124,58,237,0.5); }
+    .calc-btn:active { transform: translateY(0); }
+
+    .result-panel {
+      margin-top: 24px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      display: none;
+    }
+    .result-panel.show {
+      opacity: 1;
+      transform: translateY(0);
+      display: block;
+    }
+
+    .net-hero {
+      background: linear-gradient(145deg, rgba(124,58,237,0.15), rgba(6,182,212,0.1));
+      border: 1px solid rgba(124,58,237,0.25);
+      border-radius: 18px;
+      padding: 24px 24px 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .net-hero::before {
+      content: '';
+      position: absolute;
+      top: -40px; left: 50%;
+      transform: translateX(-50%);
+      width: 200px; height: 80px;
+      background: radial-gradient(ellipse, rgba(124,58,237,0.3), transparent 70%);
+    }
+    .net-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: rgba(167,139,250,0.7);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .net-amount {
+      font-family: 'Syne', sans-serif;
+      font-size: 46px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a78bfa, #38bdf8, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+    .net-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+      margin-top: 8px;
+    }
+    .bar-wrap { margin-top: 14px; display: flex; gap: 3px; border-radius: 10px; overflow: hidden; }
+    .bar-net {
+      height: 5px;
+      background: linear-gradient(90deg, #7c3aed, #06b6d4);
+      transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .bar-tax { height: 5px; flex: 1; background: rgba(248,113,113,0.3); }
+
+    .breakdown {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .br-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .br-row:last-child { border-bottom: none; }
+    .br-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      color: rgba(255,255,255,0.45);
+    }
+    .br-label-bold {
+      color: rgba(255,255,255,0.65);
+      font-weight: 700;
+    }
+    .br-label-green { color: #34d399; font-weight: 700; }
+    .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .br-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+    }
+    .br-val.neg { color: #f87171; }
+    .br-val.pos { color: #34d399; }
+    .br-row-highlight { background: rgba(255,255,255,0.02); }
+    .br-row-net { background: rgba(52,211,153,0.04); }
+
+    .reset-btn {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      background: transparent;
+      color: rgba(255,255,255,0.35);
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: all 0.2s;
+    }
+    .reset-btn:hover {
+      border-color: rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.65);
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* Number color fix for webkit */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] { -moz-appearance: textfield; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="glass-card">
+      <div class="top-banner">
+        <div class="banner-eyebrow">💵 Calculadora de</div>
+        <div class="banner-title">Cheque <span>de Pago</span></div>
+        <div class="pill-row">
+          <span class="pill">OVERTIME ×1.5</span>
+          <span class="pill">IMPUESTOS AUTO</span>
+        </div>
+      </div>
+
+      <div class="body-pad">
+        <div class="section-label">Información de Pago</div>
+
+        <div class="field">
+          <div class="field-label">Pago por Hora</div>
+          <div class="input-shell">
+            <span class="pre">$</span>
+            <input class="inp" id="hourlyRate" type="number" placeholder="0.00" min="0" step="0.25" />
+            <span class="suf">/ hr</span>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="field">
+            <div class="field-label">Horas Regulares</div>
+            <div class="input-shell">
+              <input class="inp inp-padded" id="regularHours" type="number" placeholder="40" min="0" />
+              <span class="suf">hrs</span>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">Overtime <span class="tag">×1.5</span></div>
+            <div class="input-shell">
+              <input class="inp inp-padded" id="overtimeHours" type="number" placeholder="0" min="0" />
+              <span class="suf">hrs</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+        <div class="section-label">Impuestos</div>
+
+        <div class="slider-header">
+          <div class="field-label" style="margin-bottom:0">Tasa de Impuesto</div>
+          <div class="slider-val" id="taxDisplay">15%</div>
+        </div>
+        <input type="range" class="slider-track" id="taxRate" min="0" max="40" value="15" style="margin-top:10px" />
+        <div class="slider-limits">
+          <span>0%</span>
+          <span>40%</span>
+        </div>
+
+        <button class="calc-btn" id="calcBtn">✦ Calcular Mi Cheque</button>
+
+        <div class="result-panel" id="resultPanel">
+          <div class="net-hero">
+            <div class="net-eyebrow">Pago Neto</div>
+            <div class="net-amount" id="netAmount">$0.00</div>
+            <div class="net-sub" id="netSub"></div>
+            <div class="bar-wrap">
+              <div class="bar-net" id="barNet" style="width:0%"></div>
+              <div class="bar-tax"></div>
+            </div>
+          </div>
+
+          <div class="breakdown">
+            <div class="br-row">
+              <div class="br-label"><div class="dot" style="background:#a78bfa"></div>Pago Regular</div>
+              <div class="br-val" id="regularPayVal"></div>
+            </div>
+            <div class="br-row">
+              <div class="br-label"><div class="dot" style="background:#38bdf8"></div>Overtime (×1.5)</div>
+              <div class="br-val" id="overtimePayVal"></div>
+            </div>
+            <div class="br-row br-row-highlight">
+              <div class="br-label br-label-bold"><div class="dot" style="background:rgba(255,255,255,0.3)"></div>Pago Bruto</div>
+              <div class="br-val" id="grossPayVal" style="color:#f0f0ff"></div>
+            </div>
+            <div class="br-row">
+              <div class="br-label"><div class="dot" style="background:#f87171"></div><span id="taxLabel">Impuestos (15%)</span></div>
+              <div class="br-val neg" id="taxAmountVal"></div>
+            </div>
+            <div class="br-row br-row-net">
+              <div class="br-label br-label-green"><div class="dot" style="background:#34d399"></div>NETO FINAL</div>
+              <div class="br-val pos" id="netPayVal"></div>
+            </div>
+          </div>
+
+          <button class="reset-btn" id="resetBtn">↺ Calcular de Nuevo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fmt = (n) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+
+    // Slider live update
+    const taxRangeEl = document.getElementById('taxRate');
+    const taxDisplayEl = document.getElementById('taxDisplay');
+    taxRangeEl.addEventListener('input', () => {
+      taxDisplayEl.textContent = taxRangeEl.value + '%';
+    });
+
+    // Animated number
+    function animateNumber(el, endValue, duration = 600) {
+      const startValue = 0;
+      const startTime = performance.now();
+      const tick = (now) => {
+        const t = Math.min((now - startTime) / duration, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        el.textContent = fmt(startValue + (endValue - startValue) * ease);
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+
+    // Calculate
+    document.getElementById('calcBtn').addEventListener('click', () => {
+      const rate = parseFloat(document.getElementById('hourlyRate').value);
+      const reg  = parseFloat(document.getElementById('regularHours').value) || 0;
+      const ot   = parseFloat(document.getElementById('overtimeHours').value) || 0;
+      const tax  = parseFloat(taxRangeEl.value) / 100;
+
+      if (!rate || rate <= 0) return;
+
+      const regularPay  = rate * reg;
+      const overtimePay = rate * 1.5 * ot;
+      const grossPay    = regularPay + overtimePay;
+      const taxAmount   = grossPay * tax;
+      const netPay      = grossPay - taxAmount;
+      const netPct      = grossPay > 0 ? ((netPay / grossPay) * 100).toFixed(1) : 0;
+
+      // Hide panel first for transition
+      const panel = document.getElementById('resultPanel');
+      panel.classList.remove('show');
+      panel.style.display = 'none';
+
+      setTimeout(() => {
+        document.getElementById('regularPayVal').textContent = fmt(regularPay);
+        document.getElementById('overtimePayVal').textContent = fmt(overtimePay);
+        document.getElementById('grossPayVal').textContent = fmt(grossPay);
+        document.getElementById('taxAmountVal').textContent = '−' + fmt(taxAmount);
+        document.getElementById('netPayVal').textContent = fmt(netPay);
+        document.getElementById('taxLabel').textContent = 'Impuestos (' + taxRangeEl.value + '%)';
+        document.getElementById('netSub').textContent =
+          'Después de ' + taxRangeEl.value + '% impuestos · ' + netPct + '% de tu bruto';
+        document.getElementById('barNet').style.width = netPct + '%';
+
+        panel.style.display = 'block';
+        // Force reflow for transition
+        panel.offsetHeight;
+        panel.classList.add('show');
+
+        animateNumber(document.getElementById('netAmount'), netPay);
+      }, 50);
+    });
+
+    // Reset
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      const panel = document.getElementById('resultPanel');
+      panel.classList.remove('show');
+      setTimeout(() => {
+        document.getElementById('hourlyRate').value   = '';
+        document.getElementById('regularHours').value = '';
+        document.getElementById('overtimeHours').value = '';
+        taxRangeEl.value = 15;
+        taxDisplayEl.textContent = '15%';
+        panel.style.display = 'none';
+      }, 400);
+    });
+  </script>
+</body>
+</html>
