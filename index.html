@@ -161,7 +161,11 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
+      min-width: 0;
     }
+    .two-col .field { min-width: 0; }
+    .two-col .input-shell { min-width: 0; overflow: hidden; }
+    .two-col .inp { min-width: 0; width: 0; }
 
     .sep {
       height: 1px;
@@ -474,12 +478,39 @@
   <script>
     const fmt = (n) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 
+    // --- localStorage ---
+    function saveData() {
+      localStorage.setItem('paycheck_hourlyRate',   document.getElementById('hourlyRate').value);
+      localStorage.setItem('paycheck_regularHours', document.getElementById('regularHours').value);
+      localStorage.setItem('paycheck_taxRate',      document.getElementById('taxRate').value);
+    }
+
+    function loadData() {
+      const rate = localStorage.getItem('paycheck_hourlyRate');
+      const reg  = localStorage.getItem('paycheck_regularHours');
+      const tax  = localStorage.getItem('paycheck_taxRate');
+      if (rate) document.getElementById('hourlyRate').value   = rate;
+      if (reg)  document.getElementById('regularHours').value = reg;
+      if (tax)  { document.getElementById('taxRate').value = tax; taxDisplayEl && (taxDisplayEl.textContent = tax + '%'); }
+    }
+
+    // Auto-save on any input change
+    ['hourlyRate','regularHours'].forEach(id => {
+      document.getElementById(id).addEventListener('input', saveData);
+    });
+
     // Slider live update
     const taxRangeEl = document.getElementById('taxRate');
     const taxDisplayEl = document.getElementById('taxDisplay');
     taxRangeEl.addEventListener('input', () => {
       taxDisplayEl.textContent = taxRangeEl.value + '%';
+      saveData();
     });
+
+    // Load saved data on page start
+    loadData();
+    // Sync slider display after load
+    taxDisplayEl.textContent = taxRangeEl.value + '%';
 
     // Animated number
     function animateNumber(el, endValue, duration = 600) {
@@ -540,12 +571,15 @@
       const panel = document.getElementById('resultPanel');
       panel.classList.remove('show');
       setTimeout(() => {
-        document.getElementById('hourlyRate').value   = '';
-        document.getElementById('regularHours').value = '';
+        document.getElementById('hourlyRate').value    = '';
+        document.getElementById('regularHours').value  = '';
         document.getElementById('overtimeHours').value = '';
         taxRangeEl.value = 15;
         taxDisplayEl.textContent = '15%';
         panel.style.display = 'none';
+        localStorage.removeItem('paycheck_hourlyRate');
+        localStorage.removeItem('paycheck_regularHours');
+        localStorage.removeItem('paycheck_taxRate');
       }, 400);
     });
   </script>
